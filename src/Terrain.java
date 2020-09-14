@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Locale;
 
 public class Terrain {
 
@@ -36,7 +37,7 @@ public class Terrain {
 	}
 	
 	// convert linear position into 2D location in grid
-	void locate(int pos, int [] ind)
+	void locate(int pos, int [] ind) //from permuted array, get co-ordinates wrt 2D array
 	{
 		ind[0] = (int) pos / dimy; // x
 		ind[1] = pos % dimy; // y	
@@ -81,12 +82,12 @@ public class Terrain {
 	void getPermute(int i, int [] loc) {
 		locate(permute.get(i), loc);
 	}
-	
+								//puts co-ordinates of that number into loc?
 	// read in terrain from file
 	void readData(String fileName){ 
 		try{ 
 			Scanner sc = new Scanner(new File(fileName));
-			
+			sc.useLocale(Locale.US);
 			// read grid dimensions
 			// x and y correpond to columns and rows, respectively.
 			// Using image coordinate system where top left is (0, 0).
