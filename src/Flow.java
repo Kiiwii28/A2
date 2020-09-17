@@ -14,7 +14,7 @@ public class Flow{
 	static int frameX;
 	static int frameY;
 	static FlowPanel fp;
-	static Water flood;
+	static Water flood; //might not be necessary could be handeled by waterpanel
 
 	// start timer
 	private static void tick(){
@@ -36,7 +36,7 @@ public class Flow{
       	JPanel g = new JPanel();
         g.setLayout(new BoxLayout(g, BoxLayout.PAGE_AXIS)); 
    
-		fp = new FlowPanel(landdata);
+		fp = new FlowPanel(landdata,flood);
 		fp.setPreferredSize(new Dimension(frameX,frameY));
 		g.add(fp); //frame > J panel > (flow panel + buttons and timesteps)
 
@@ -47,7 +47,8 @@ public class Flow{
 				System.out.println("you clicked, didn't you?");
 				int mousex = e.getX();
 				int mousey = e.getY();
-				flood.drop(mousex,mousey,3);
+				flood.drop(mousex,mousey,5,6);
+				fp.test();
 			}
 
 	   		public void mouseExited(MouseEvent e){ }
@@ -132,6 +133,7 @@ public class Flow{
 		// to do: initialise and start simulation
 		flood = new Water(landdata.getDimX(),landdata.getDimY());
 		flood.init();
+
 		float testLevel = flood.getWaterLevel(1,2);
 		System.out.println(testLevel);
 		float testland = landdata.height[0][0];

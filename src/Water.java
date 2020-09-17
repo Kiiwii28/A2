@@ -31,15 +31,24 @@ public class Water{
                 wLevel[x][y] = 0;
             }
         }
+        for(int x = 0; x<14;x++){
+
+            for(int y = 0; y<14; y++){
+                wLevel[x][y] = 1;
+            }
+        }
+
     }
-    public void drop(int x, int y,int rise){
+    public void drop(int x, int y,int depth,int span){
        // synchronized (droplock)
         //check for not going over edges
         System.out.println("adding water to point x =" + x + " and y = " + y);
-        for(int i = -1; i<2;i++){
-            for(int j = -1; j<2;j++){
+
+
+        for(int i = (-span); i<span;i++){
+            for(int j = (-span); j<span;j++){
                 System.out.println(wLevel[x+i][y+j] + " before");
-                wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*rise) ;
+                wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*depth) ;
                 System.out.println(wLevel[x+i][y+j] + " after");
             }
         }
@@ -60,13 +69,32 @@ public class Water{
         return dimy;
     }
 
-    // get greyscale image
+    public float getWaterLevel(int x,int y){
+        return wLevel[x][y];
+    }
+
     public BufferedImage getImage() {
         return wImg;
     }
 
-    public float getWaterLevel(int x,int y){
-        return wLevel[x][y];
+    void deriveImage(){
+        Color transparent = new Color(0,0,0,0);
+        int height = dimy;
+        int width = dimx;
+        wImg = new BufferedImage(dimx, dimy, BufferedImage.TYPE_INT_ARGB);
+        for(int i = 0; i<width;i++){
+            for(int j = 0; j<height;j++){
+                if (wLevel[i][j] > 0){
+                    wImg.setRGB(i,j,Color.BLUE.getRGB());
+                }
+                else{
+                    wImg.setRGB(i,j,transparent.getRGB());
+                    }
+                }
+            }
+        }
+
+
     }
 
     /**
@@ -91,5 +119,3 @@ public class Water{
 
          }
             **/
-
-}

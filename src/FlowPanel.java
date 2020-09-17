@@ -5,8 +5,10 @@ import javax.swing.JPanel;
 
 public class FlowPanel extends JPanel implements Runnable {
 	Terrain land;
-	
-	FlowPanel(Terrain terrain) {
+	Water flood;
+	//Water flood;
+	FlowPanel(Terrain terrain,Water water) {
+		flood = water;
 		land=terrain;
 	}
 		
@@ -14,6 +16,7 @@ public class FlowPanel extends JPanel implements Runnable {
 	// as images
 	@Override
     protected void paintComponent(Graphics g) {
+
 		int width = getWidth();
 		int height = getHeight();
 		  
@@ -23,6 +26,21 @@ public class FlowPanel extends JPanel implements Runnable {
 		if (land.getImage() != null){
 			g.drawImage(land.getImage(), 0, 0, null);
 		}
+		//?paid overlay image graphic from water.getImage()
+		flood.deriveImage();
+		if(flood.getImage() != null){
+			g.drawImage(flood.getImage(),0,0,null);
+		}
+		/**
+		BufferedImage background = land.getImage();
+		BufferedImage foreground = flood.getImage();
+		BufferedImage overlayedImage = overLa
+		**/
+	}
+	public void test(){
+		System.out.println("in test before repaint");
+		repaint();
+		System.out.println("in test before repaint");
 	}
 	
 	public void run() {	
