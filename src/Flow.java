@@ -71,6 +71,7 @@ public class Flow{
 		bStart.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				System.out.println("start button pressed");
+				fp.play();
 			}
 		});
 
@@ -78,6 +79,7 @@ public class Flow{
 		bPause.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				System.out.println("pause button pressed");
+				fp.pause();
 			}
 		});
 
@@ -86,6 +88,7 @@ public class Flow{
 		endB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				// to do ask threads to stop
+				fp.setbRunning(false);
 				frame.dispose();
 			}
 		});
@@ -108,6 +111,7 @@ public class Flow{
         frame.setContentPane(g);
         frame.setVisible(true);
         Thread fpt = new Thread(fp); //main single thread?
+		fp.setbRunning(true);
         fpt.start();
 	}
 	
