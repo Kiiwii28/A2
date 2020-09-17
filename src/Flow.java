@@ -47,8 +47,8 @@ public class Flow{
 				System.out.println("you clicked, didn't you?");
 				int mousex = e.getX();
 				int mousey = e.getY();
-				flood.drop(mousex,mousey,5,6);
-				fp.test();
+				flood.drop(mousex,mousey,5,2);
+				//fp.test();
 			}
 
 	   		public void mouseExited(MouseEvent e){ }
@@ -66,6 +66,14 @@ public class Flow{
 	    		System.out.println("hello, baby");
 			}
 		});
+
+		JButton btReset = new JButton("Reset");
+		kiera.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				flood.init();
+			}
+		});
+
 
 		JButton bStart = new JButton("Start");
 		bStart.addActionListener(new ActionListener(){

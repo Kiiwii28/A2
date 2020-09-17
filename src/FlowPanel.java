@@ -62,15 +62,26 @@ public class FlowPanel extends JPanel implements Runnable {
 	}
 
 	public void run(){
-
+      //System.out.println("x is = " + land.getDimX() + ". y is = " + land.getDimY());
 		while(bRunning){
 			if(!bPause){
+				flood.clearEdges();
 				System.out.println("running, not paused");
-				try{
-					Thread.sleep(2000);
-				}catch (InterruptedException e){
-					e.printStackTrace();
+				for(int i = 0;i<land.dim();i++){
+					int[] loc = new int[2];
+					loc = land.getPermute(i,loc);
+					//System.out.println(loc[0] + " is first index of loc = x, and y is "+ loc[1]);
+					flood.move(loc[0],loc[1],land);
+
+//					try{ Thread.sleep(2000);
+//						repaint();
+//					}
+//					catch (InterruptedException e){
+//						e.printStackTrace(); }
+//					flood.drop(loc[0],loc[1],1,1);
+					repaint();
 				}
+
 			}
 			else{
 				System.out.println("running, BUT paused");

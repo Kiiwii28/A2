@@ -15,7 +15,10 @@ public class Terrain {
 	BufferedImage img; // greyscale image for displaying the terrain top-down
 
 	ArrayList<Integer> permute;	// permuted list of integers in range [0, dimx*dimy)
-	
+
+	float getHeight(int x,int y){
+		return height[x][y];
+	}
 	// overall number of elements in the height grid
 	int dim(){
 		return dimx*dimy;
@@ -79,8 +82,10 @@ public class Terrain {
 	
 	// find permuted 2D location from a linear index in the
 	// range [0, dimx*dimy)
-	void getPermute(int i, int [] loc) {
+	int[] getPermute(int i, int [] loc) {
+
 		locate(permute.get(i), loc);
+		return loc;
 	}
 								//puts co-ordinates of that number into loc?
 	// read in terrain from file

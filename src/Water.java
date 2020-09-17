@@ -31,9 +31,9 @@ public class Water{
                 wLevel[x][y] = 0;
             }
         }
-        for(int x = 0; x<14;x++){
 
-            for(int y = 0; y<14; y++){
+        for(int x = 300; x<14;x++){
+            for(int y = 300; y<14; y++){
                 wLevel[x][y] = 1;
             }
         }
@@ -47,9 +47,13 @@ public class Water{
 
         for(int i = (-span); i<span;i++){
             for(int j = (-span); j<span;j++){
-                System.out.println(wLevel[x+i][y+j] + " before");
-                wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*depth) ;
-                System.out.println(wLevel[x+i][y+j] + " after");
+              //  System.out.println(wLevel[x+i][y+j] + " before");
+                System.out.println("[x+i]= " + (x+i) + "  [y+j]= " + (y+j));
+                if (((x+i) > -1 & (y+j) > -1) & ((x+i) < dimx & (y+j) < dimy)){
+                    wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*depth) ;
+                    //System.out.println(wLevel[x+i][y+j] + " after");
+                }
+
             }
         }
     }
@@ -68,6 +72,87 @@ public class Water{
     int getDimY(){
         return dimy;
     }
+
+    public void clearEdges(){
+        //iterate through first row
+        for (int j = 0;j<dimy;j++){
+            wLevel[0][j] = 0;
+            System.out.println("cleared: x = 0" + " y = " + j);
+        }
+
+        //iterate through last row
+        for (int j = 0;j<dimy;j++){
+            wLevel[dimx-1][j] = 0;
+            System.out.println("cleared: x = "+ j + " y = " + (dimy-1));
+            //wLevel[i][dimy] = 0;
+        }
+
+        //loop through all rows and set first and last column to zero
+        for (int i = 1;i<dimx-1;i++){
+            wLevel[i][0] = 0;
+            System.out.println("cleared: x = "+ i + " y = 0");
+            wLevel[i][dimy-1] = 0;
+            System.out.println("cleared: x = "+i + " y = "+ (dimy-1));
+            //wLevel[i][dimy] = 0;
+        }
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     */
+    public void move(int x,int y,Terrain land){
+
+//        System.out.println("inside move: x = " + x + ", y = " + y);
+//        System.out.println("water value is: " + wLevel[x][y]);
+//        System.out.println("terrain value is: " + land.getHeight(x,y));
+//        System.out.println("surface value is: " + (land.getHeight(x,y)+ wLevel[x][y]));
+        float surfaceMin = wLevel[x][y] + land.getHeight(x,y);
+        float surface = 0;
+
+        int minX = x;
+        int minY = y;
+
+        //find minimum
+        //check not edge because edges would be zero
+        if (wLevel[x][y] > 0) {
+            for(int i = -1; i<2;i++) {
+                for (int j = -1; j < 2; j++) {
+                    surface = land.getHeight(x+i,y+j) + wLevel[x+i][y+j];
+                    if (surface<surfaceMin){
+                        //System.out.println("new min is " + surface );
+                        surfaceMin = surface;
+                        minX = x+i;
+                        minY = y+j;
+                }
+            }
+          if ((minX != x) & (minY != y)){
+              System.out.println("transfering to min at X = " + minX + " y is " + minY);
+              System.out.println("min value =" + surfaceMin);
+              wLevel[x][y] = wLevel[x][y] - 0.01f;
+              wLevel[minX][minY] = wLevel[minX][minY] + 0.01f;
+          }
+
+        }
+//        for(int i = -1; i<2;i++){
+//            for(int j = -1; j<2;j++){
+//                if (wLevel[x+i][y+j] != null){
+//                    if(wLevel[x+i][y+j] > 0){
+//
+//                    }
+//                }
+                //  System.out.println(wLevel[x+i][y+j] + " before");
+//                System.out.println("[x+i]= " + (x+i) + "  [y+j]= " + (y+j));
+//                if (((x+i) > -1 & (y+j) > -1) & ((x+i) < dimx & (y+j) < dimy)){
+//                    if(wLevel[x+i][y+j] != null & )
+//                    wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*depth) ;
+                    //System.out.println(wLevel[x+i][y+j] + " after");
+                }
+
+            }
+
+
 
     public float getWaterLevel(int x,int y){
         return wLevel[x][y];
