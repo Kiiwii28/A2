@@ -79,7 +79,9 @@ public class Flow{
 		bStart.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				System.out.println("start button pressed");
+
 				fp.play();
+				//fp.setbRunning(true);
 			}
 		});
 
@@ -119,7 +121,8 @@ public class Flow{
         frame.setContentPane(g);
         frame.setVisible(true);
         Thread fpt = new Thread(fp); //main single thread?
-		fp.setbRunning(true);
+		fp.pause();
+		fp.setbRunning(true);//testing
         fpt.start();
 	}
 	
