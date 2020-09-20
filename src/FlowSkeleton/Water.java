@@ -48,7 +48,7 @@ public class Water{
         for(int i = (-span); i<span;i++){
             for(int j = (-span); j<span;j++){
               //  System.out.println(wLevel[x+i][y+j] + " before");
-                System.out.println("[x+i]= " + (x+i) + "  [y+j]= " + (y+j));
+              //  System.out.println("[x+i]= " + (x+i) + "  [y+j]= " + (y+j));
                 if (((x+i) > -1 & (y+j) > -1) & ((x+i) < dimx & (y+j) < dimy)){
                     wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*depth) ;
                     //System.out.println(wLevel[x+i][y+j] + " after");
@@ -77,22 +77,22 @@ public class Water{
         //iterate through first row
         for (int j = 0;j<dimy;j++){
             wLevel[0][j] = 0;
-            System.out.println("cleared: x = 0" + " y = " + j);
+            //System.out.println("cleared: x = 0" + " y = " + j);
         }
 
         //iterate through last row
         for (int j = 0;j<dimy;j++){
             wLevel[dimx-1][j] = 0;
-            System.out.println("cleared: x = "+ j + " y = " + (dimy-1));
+            //System.out.println("cleared: x = "+ j + " y = " + (dimy-1));
             //wLevel[i][dimy] = 0;
         }
 
         //loop through all rows and set first and last column to zero
         for (int i = 1;i<dimx-1;i++){
             wLevel[i][0] = 0;
-            System.out.println("cleared: x = "+ i + " y = 0");
+            //System.out.println("cleared: x = "+ i + " y = 0");
             wLevel[i][dimy-1] = 0;
-            System.out.println("cleared: x = "+i + " y = "+ (dimy-1));
+            //System.out.println("cleared: x = "+i + " y = "+ (dimy-1));
             //wLevel[i][dimy] = 0;
         }
     }
@@ -104,7 +104,7 @@ public class Water{
      */
     public void move(int x,int y,Terrain land){
 
-//        System.out.println("inside move: x = " + x + ", y = " + y);
+        System.out.println("inside move: x = " + x + ", y = " + y);
 //        System.out.println("water value is: " + wLevel[x][y]);
 //        System.out.println("terrain value is: " + land.getHeight(x,y));
 //        System.out.println("surface value is: " + (land.getHeight(x,y)+ wLevel[x][y]));
@@ -129,7 +129,7 @@ public class Water{
             }
           if ((minX != x) & (minY != y)){
               System.out.println("transfering to min at X = " + minX + " y is " + minY);
-              System.out.println("min value =" + surfaceMin);
+              //System.out.println("min value =" + surfaceMin);
               wLevel[x][y] = wLevel[x][y] - 0.01f;
               wLevel[minX][minY] = wLevel[minX][minY] + 0.01f;
           }

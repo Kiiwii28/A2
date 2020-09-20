@@ -79,6 +79,15 @@ public class Terrain {
 			permute.add(idx);
 		java.util.Collections.shuffle(permute);
 	}
+	Integer[] genPermute2(int lo,int hi) {
+		int range = hi-lo;
+		ArrayList<Integer> permute2 = new ArrayList<Integer>();
+		for(int idx = lo; idx < hi; idx++)
+			permute2.add(idx);
+		java.util.Collections.shuffle(permute2);
+		Integer[] result = permute2.toArray(new Integer[0]);
+		return result ;
+	}
 	
 	// find permuted 2D location from a linear index in the
 	// range [0, dimx*dimy)
