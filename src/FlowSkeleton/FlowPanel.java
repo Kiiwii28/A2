@@ -209,7 +209,7 @@ public class FlowPanel extends JPanel implements Runnable {
 				//tsc.set(0);
 				try {
 					iteration++;
-					System.out.println("full 2d grid iteration " + iteration + " and trying to give head start");
+					//System.out.println("full 2d grid iteration " + iteration + " and trying to give head start");
 					repaint();
 					Thread.sleep(0);
 					//may need to put these in synchronized method?

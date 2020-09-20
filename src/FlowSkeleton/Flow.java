@@ -47,7 +47,7 @@ public class Flow{
 				System.out.println("you clicked, didn't you?");
 				int mousex = e.getX();
 				int mousey = e.getY();
-				flood.drop(mousex,mousey,1,5);
+				flood.drop(mousex,mousey,2,2);
 				//fp.test();
 			}
 
