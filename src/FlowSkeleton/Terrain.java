@@ -42,8 +42,8 @@ public class Terrain {
 	// convert linear position into 2D location in grid
 	void locate(int pos, int [] ind) //from permuted array, get co-ordinates wrt 2D array
 	{
-		ind[0] = (int) pos / dimy; // x
-		ind[1] = pos % dimy; // y	
+		ind[0] = (int) pos / dimy; // x //rows
+		ind[1] = pos % dimy; // y	//columns
 	}
 	
 	// convert height values to greyscale colour and populate an image

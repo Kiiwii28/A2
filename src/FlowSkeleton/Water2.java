@@ -2,6 +2,7 @@ package FlowSkeleton;
 
 import java.awt.image.*; //includes bufferedImage?
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
@@ -11,9 +12,21 @@ public class Water2{
     private static AtomicIntegerArray wLevel;
     BufferedImage wImg;
     int dim; //dimension x*y)
+    volatile boolean bFirstRun;
+    int dimY;
+    int dimX;
+   // ArrayList<Integer> blue = new ArrayList<Integer>();
+    ArrayList<Integer> edges = new ArrayList<Integer>();
+    ArrayList<Integer> check = new ArrayList<Integer>();
+   // ArrayList<Integer> clear = new ArrayList<Integer>();
 
-    public Water(int xx, int yy){
+    public Water2(int xx, int yy){
+        dimY = yy;
+        dimX = xx;
        dim = xx*yy;
+       wLevel = new AtomicIntegerArray(dim);
+       bFirstRun = true;
+       setEdges();
 
 
 
@@ -21,76 +34,67 @@ public class Water2{
     }
 
     public void init(){
-        wLevel = new float[dimx][dimy];
-        for(int x = 0; x<dimx;x++){
-
-            for(int y = 0; y<dimy; y++){
-                wLevel[x][y] = 0;
-            }
-        }
-
-        for(int x = 300; x<14;x++){
-            for(int y = 300; y<14; y++){
-                wLevel[x][y] = 1;
-            }
+        for (int i=0;i<dim;i++){
+            wLevel.set(i,0);
         }
 
     }
     public void drop(int x, int y,int depth,int span){
-        // synchronized (droplock)
         //check for not going over edges
         System.out.println("adding water to point x =" + x + " and y = " + y);
+        int linearPos = ((x*dimY)+y);
 
-
-        for(int i = (-span); i<span;i++){
-            for(int j = (-span); j<span;j++){
-                //  System.out.println(wLevel[x+i][y+j] + " before");
-                //  System.out.println("[x+i]= " + (x+i) + "  [y+j]= " + (y+j));
-                if (((x+i) > -1 & (y+j) > -1) & ((x+i) < dimx & (y+j) < dimy)){
-                    wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*depth) ;
-                    //System.out.println(wLevel[x+i][y+j] + " after");
-                }
-
+        for(int i = -(span); i < (span+1); i++){
+            int line = linearPos + (i*dimY); //row is not an index
+            for(int j = -(span);j<(span+1);j++){
+                boolean NotFirstRow = line >= dimY;
+                boolean NotLastRow = line < ((dimX-1)*(dimY));
+                boolean NotFirstCol = !((line+j)%dimY==0);
+                boolean NotLastCol = !((line+j)%dimY==dimY-1);
+                if(NotFirstRow & NotLastRow & NotFirstCol & NotLastCol);
+                wLevel.getAndAdd(line+j,depth);
+                check.add(line+j);
             }
         }
     }
 
 
     int dim(){
-        return dimx*dimy;
+        return dim;
     }
 
     // get x-dimensions (number of columns)
     int getDimX(){
-        return dimx;
+        return dimX;
     }
 
     // get y-dimensions (number of rows)
     int getDimY(){
-        return dimy;
+        return dimY;
     }
 
+    public void setEdges(){
+        //add first row
+        for(int i= 0; i<dimY;i++){
+           edges.add(i);
+        }
+        //add last row
+        for (int i= ((dimX-1)*dimY); i<dimY*dimX;i++){
+            edges.add(i);
+        }
+        //add first and last column
+        for(int i = 0; i < dimY*dimX;i++){
+            if(  (i%dimY)==0 | (i%dimY)==(dimY-1)    ){
+                edges.add(i);
+            }
+        }
+
+    }
+
+
     public void clearEdges(){
-        //iterate through first row
-        for (int j = 0;j<dimy;j++){
-            wLevel[0][j] = 0;
-            //System.out.println("cleared: x = 0" + " y = " + j);
-        }
-
-        //iterate through last row
-        for (int j = 0;j<dimy;j++){
-            wLevel[dimx-1][j] = 0;
-            //System.out.println("cleared: x = "+ j + " y = " + (dimy-1));
-            //wLevel[i][dimy] = 0;
-        }
-
-        //loop through all rows and set first and last column to zero
-        for (int i = 1;i<dimx-1;i++){
-            wLevel[i][0] = 0;
-            //System.out.println("cleared: x = "+ i + " y = 0");
-            wLevel[i][dimy-1] = 0;
-            //System.out.println("cleared: x = "+i + " y = "+ (dimy-1));
-            //wLevel[i][dimy] = 0;
+        for(int i=0;i<edges.size();i++) {
+            wLevel.set(edges.get(i), 0); //edges is list of indices, not actual values
         }
     }
 
@@ -99,15 +103,15 @@ public class Water2{
      * @param x
      * @param y
      */
-    public void move(int x,int y,Terrain land){
+    public synchronized void move(int x,int y,Terrain land){
 
 
-        if (wLevel[x][y] > 0) {
-            System.out.println("inside move: x = " + x + ", y = " + y);
+        if (getWaterLevel(x,y) > 0) {
+           // System.out.println("inside move: x = " + x + ", y = " + y);
 //        System.out.println("water value is: " + wLevel[x][y]);
 //        System.out.println("terrain value is: " + land.getHeight(x,y));
 //        System.out.println("surface value is: " + (land.getHeight(x,y)+ wLevel[x][y]));
-            float surfaceMin = wLevel[x][y] + land.getHeight(x,y);
+            float surfaceMin = (float)(getWaterLevel(x,y)*0.01) + land.getHeight(x,y);
             float surface = 0;
 
             int minX = x;
@@ -117,88 +121,86 @@ public class Water2{
             //check not edge because edges would be zero
             for(int i = -1; i<2;i++) {
                 for (int j = -1; j < 2; j++) {
-                    surface = land.getHeight(x+i,y+j) + wLevel[x+i][y+j];
-                    if (surface<surfaceMin){
+                    surface = land.getHeight(x + i, y + j) + (float)(getWaterLevel(x + i, y + j)*0.01);
+                    if (surface < surfaceMin) {
                         //System.out.println("new min is " + surface );
                         surfaceMin = surface;
-                        minX = x+i;
-                        minY = y+j;
+                        minX = x + i;
+                        minY = y + j;
                     }
                 }
+            }
                 if ((minX != x) & (minY != y)){
-                    System.out.println("transfering to min at X = " + minX + " y is " + minY);
+                    //System.out.println("transfering to min at X = " + minX + " y is " + minY);
                     //System.out.println("min value =" + surfaceMin);
-                    wLevel[x][y] = wLevel[x][y] - 0.01f;
-                    wLevel[minX][minY] = wLevel[minX][minY] + 0.01f;
+                    setWaterLevel(x,y,getWaterLevel(x,y) - 1);
+                    check.add((x*dimY)+y); //add that x,y as a linear index to array of cells that need to be checked/updated
+                    setWaterLevel(minX,minY,getWaterLevel(minX,minY)+1);
+                   check.add((minX*dimY)+minY);
                 }
 
             }
-//        for(int i = -1; i<2;i++){
-//            for(int j = -1; j<2;j++){
-//                if (wLevel[x+i][y+j] != null){
-//                    if(wLevel[x+i][y+j] > 0){
-//
-//                    }
-//                }
-            //  System.out.println(wLevel[x+i][y+j] + " before");
-//                System.out.println("[x+i]= " + (x+i) + "  [y+j]= " + (y+j));
-//                if (((x+i) > -1 & (y+j) > -1) & ((x+i) < dimx & (y+j) < dimy)){
-//                    if(wLevel[x+i][y+j] != null & )
-//                    wLevel[x+i][y+j] = wLevel[x+i][y+j] + (float) (0.01f*depth) ;
-            //System.out.println(wLevel[x+i][y+j] + " after");
-        }
-
     }
 
 
 
-    public float getWaterLevel(int x,int y){
-        return wLevel[x][y];
+
+
+    public int getWaterLevel(int x,int y){ //eg. given 5,6 with y-dimension = 11
+        //(5*11)+6
+        //get right row, then add to get to correct column
+        return wLevel.get((x*dimY)+y);
     }
 
+    public void setWaterLevel(int x,int y,int set){
+        wLevel.set((x*dimY)+y,set);
+    }
+
+    public int getWaterLevel(int pos){
+          return  wLevel.get(pos);
+    }
     public BufferedImage getImage() {
         return wImg;
     }
 
-    void deriveImage(){
+    synchronized void deriveImage(){
+
+       int height = dimY;
+       int width = dimX;
+
+//        int height = dimX; //rows
+//        int width = dimY; //columns
         Color transparent = new Color(0,0,0,0);
-        int height = dimy;
-        int width = dimx;
-        wImg = new BufferedImage(dimx, dimy, BufferedImage.TYPE_INT_ARGB);
-        for(int i = 0; i<width;i++){
-            for(int j = 0; j<height;j++){
-                if (wLevel[i][j] > 0){
-                    wImg.setRGB(i,j,Color.BLUE.getRGB());
-                }
-                else{
+
+        if (bFirstRun){
+            wImg = new BufferedImage(dimX, dimY, BufferedImage.TYPE_INT_ARGB);
+            for(int i = 0; i<dimX;i++){
+                for(int j = 0; j<dimY;j++){
                     wImg.setRGB(i,j,transparent.getRGB());
                 }
+            }
+            bFirstRun = false;
+        }
+        else{ //just updates
+            for (int i = 0; i<check.size();i++){
+                int x = check.get(i)/dimY;
+                int y = check.get(i)%dimY;
+
+                if (wLevel.get(check.get(i))>0){
+                    wImg.setRGB(x,y,Color.BLUE.getRGB());
+                    }
+                    else{
+                    wImg.setRGB(x,y,transparent.getRGB());
+                    }
+            }
+            check.clear();
+            for (int i = 0;i<edges.size();i++){ //edge is list of indices of wLevel's edges
+                int x =  edges.get(i)/dimY; //convert to 2D co-ords
+                int y =  edges.get(i)%dimX;
+                wImg.setRGB(x,y,transparent.getRGB());
             }
         }
     }
 
 
 }
-
-/**
- * find min and flow/transfer water
- * change water image overlay
- * eg.
- * ** //COMPARE SURFACE LEVELS
- float fMin = selected;
- for(int i = iRow-1;i<2;i++){
- for(int j = iCol-1;i<2;i++){
- if compare[i][j]<fMin.value(){
- fMin.value = compare[i][j];
- // pos[] = [i,k]; ????????????????
- }
-
- }
- }
- if (fMin != selected){
- fMin.waterlevel = fMin.waterlevel + 1;
- selected.waterlevel = selected.waterlevel - 1;
-
-
- }
- **/

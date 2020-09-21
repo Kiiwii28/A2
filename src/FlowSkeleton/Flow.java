@@ -14,7 +14,7 @@ public class Flow{
 	static int frameX;
 	static int frameY;
 	static FlowPanel fp;
-	static Water flood; //might not be necessary could be handeled by waterpanel
+	static Water2 flood; //might not be necessary could be handeled by waterpanel
 
 	// start timer
 	private static void tick(){
@@ -146,7 +146,7 @@ public class Flow{
 		SwingUtilities.invokeLater(()->setupGUI(frameX, frameY, landdata));
 
 		// to do: initialise and start simulation
-		flood = new Water(landdata.getDimX(),landdata.getDimY());
+		flood = new Water2(landdata.getDimX(),landdata.getDimY());
 		flood.init();
 
 		float testLevel = flood.getWaterLevel(1,2);
