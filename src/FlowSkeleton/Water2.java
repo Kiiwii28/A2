@@ -1,5 +1,6 @@
 package FlowSkeleton;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.awt.image.*; //includes bufferedImage?
 import java.awt.Color;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class Water2{
                 if(NotFirstRow & NotLastRow & NotFirstCol & NotLastCol);
                 wLevel.getAndAdd(line+j,depth);
                 check.add(line+j);
+                //System.out.println("\n\n");
             }
         }
     }
@@ -118,16 +120,24 @@ public class Water2{
      * @param x
      * @param y
      */
-    public synchronized void move(int x,int y,Terrain land){
+    public synchronized void move(int x,int y,Terrain land,String pname){
+//bring them in as local vars to compare //work with local as much as possible
+        String sName = pname;
+       // System.out.println(sName + " start ");
+        int currentBlock = getWaterLevel(x,y);
+        float currentHeight = land.getHeight(x,y);
+        if (currentBlock > 0) {//only move if it has water
+//           System.out.println("inside move: x = " + x + ", y = " + y);
+//       System.out.println("water value is: " + currentBlock);
+//            System.out.println("terrain value is: " + land.getHeight(x,y));
+//            System.out.println("surface value is: " + (land.getHeight(x,y)+ getWaterLevel(x,y)*0.01f));
 
-
-        if (getWaterLevel(x,y) > 0) {
-           // System.out.println("inside move: x = " + x + ", y = " + y);
-//        System.out.println("water value is: " + wLevel[x][y]);
-//        System.out.println("terrain value is: " + land.getHeight(x,y));
-//        System.out.println("surface value is: " + (land.getHeight(x,y)+ wLevel[x][y]));
-            float surfaceMin = (float)(getWaterLevel(x,y)*0.01) + land.getHeight(x,y);
+//            System.out.println("terrain value is: " + currentHeight);
+//        System.out.println("surface value is: " + (currentHeight + (currentBlock*0.01f)));
+           // float surfaceMin = (float)(getWaterLevel(x,y)*0.01) + land.getHeight(x,y);
+            float surfaceMin = currentHeight + (currentBlock*0.01f);
             float surface = 0;
+//            System.out.println("surface var = " + surfaceMin);
 
             int minX = x;
             int minY = y;
@@ -137,42 +147,68 @@ public class Water2{
             for(int i = -1; i<2;i++) {
                 for (int j = -1; j < 2; j++) {
                     //only checks actual grid points
-                    if(  ((x+i)>=0) & ((y+j)>=0) & ((x+i)<dimX) & ((y+j)<dimY)  ){
+//                    System.out.println((x+i) + " x. " + (y+j) + " y.");
+                    if(  ((x+i)>0) & ((y+j)>0) & ((x+i)<dimX) & ((y+j)<dimY)  ){
                         surface = land.getHeight(x + i, y + j) + (float)(getWaterLevel(x + i, y + j)*0.01);
+//                        System.out.println("current iterated surface =  "+ surface +  ". i = " + i + ". j = " + j);
 
                         if (surface < surfaceMin) {
-                            //System.out.println("new min is " + surface );
+
                             surfaceMin = surface;
                             minX = x + i;
                             minY = y + j;
+//                            System.out.println("new min is " + surfaceMin + " x & y: " + minX +" " + minY );
                         }
                     }
 
                 }
             }
-                if ((minX != x) & (minY != y)){
-                    //System.out.println("transfering to min at X = " + minX + " y is " + minY);
-                    //System.out.println("min value =" + surfaceMin);
-                    setWaterLevel(x,y,getWaterLevel(x,y) - 1);
-                    check.add((x*dimY)+y); //add that x,y as a linear index to array of cells that need to be checked/updated
-                    setWaterLevel(minX,minY,getWaterLevel(minX,minY)+1);
-                   check.add((minX*dimY)+minY);
-                }
+            if((minX == x)&(minY == y)){
+                System.out.println("Is its own minimum + x = " + x + ". y = " + y);
 
             }
+            else{
+//                System.out.println("BEFORE TRANSFERRING: transferring to min at X = " + minX + " y is " + minY +" new minval " + surfaceMin+"\n, old min at" + x +"= x. "+ y + "= y. with old min = " + ((getWaterLevel(x,y)*0.01f)+land.getHeight(x,y)));
+//                System.out.println("min value =" + surfaceMin);
+                // setWaterLevel(x,y,getWaterLevel(x,y) - 1);
+                setWaterLevel(x,y,currentBlock - 1);
+//                System.out.println("new OG waterlevel is " + getWaterLevel(x,y));
+                check.add((x*dimY)+y); //add that x,y as a linear index to array of cells that need to be checked/updated
+                setWaterLevel(minX,minY,getWaterLevel(minX,minY)+1);
+                check.add((minX*dimY)+minY);
+//                System.out.println("new added to min waterlevel is " + getWaterLevel(minX,minY));
+            }
+
+        }
+       // System.out.println(sName + " finish ");
     }
+//
+//    public void move1(int x,int y,int exp,int xN,int yN,int expN){
+//        Object bLock;
+//        int pos = ((x*dimY)+y);
+//        int posN = (xN*dimY)+yN;
+//        synchronized (wLevel){
+//            boolean done = false;
+//            while (!done){
+//                if ((wLevel.compareAndSet(pos,exp,exp-1) == true) & (wLevel.compareAndSet(posN,expN,expN+1))){
+//                        done = true;
+//                }
+//            }
+//
+//
+//        }
+//    }
 
 
 
 
-
-    public int getWaterLevel(int x,int y){ //eg. given 5,6 with y-dimension = 11
+    public synchronized int getWaterLevel(int x,int y){ //eg. given 5,6 with y-dimension = 11
         //(5*11)+6
         //get right row, then add to get to correct column
         return wLevel.get((x*dimY)+y);
     }
 
-    public void setWaterLevel(int x,int y,int set){
+    public synchronized void setWaterLevel(int x,int y,int set){
         wLevel.set((x*dimY)+y,set);
     }
 

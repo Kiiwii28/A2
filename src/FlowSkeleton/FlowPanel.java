@@ -104,12 +104,13 @@ public class FlowPanel extends JPanel implements Runnable {
 			tick();
 			if(!bPause){
 				//System.out.println("while loop");
+				//System.out.println(System.currentTimeMillis()-startT);
 				flood.clearEdges(); //if all waiting after a pause, will resume them
 				if (booleant1.get()==false && booleant2.get()==false && booleant3.get()==false && booleant4.get()==false && ((System.currentTimeMillis()-startT)>10)){
 					iteration++;
-					System.out.println(tock() + " threads done");
-					System.out.println("full 2d grid iteration " + iteration + " and trying to give head start");
-					startT = System.currentTimeMillis();
+//					System.out.println(tock() + " threads done");
+//					System.out.println("full 2d grid iteration " + iteration + " and trying to give head start");
+//					startT = System.currentTimeMillis();
 					tick();
 					repaint();
 					//System.out.println(tock() + " repaint done");
@@ -126,6 +127,8 @@ public class FlowPanel extends JPanel implements Runnable {
 
 			}
 		}
+		//bRunning is false
+
 
 	}
 
@@ -157,8 +160,8 @@ public class FlowPanel extends JPanel implements Runnable {
 				hi = pHi;
 				name = word;
 				bT = booleant;
-				System.out.println("hi = " + hi + ". lo = "+lo);
-				System.out.println("hi - lo = " + (hi - lo) );
+//				System.out.println("hi = " + hi + ". lo = "+lo);
+//				System.out.println("hi - lo = " + (hi - lo) );
 
 
 			}
@@ -184,7 +187,7 @@ public class FlowPanel extends JPanel implements Runnable {
 							local++;
 							loc = FlowPanel.land.getPermute(i, loc);
 							//System.out.println(loc[0] + " is first index of loc = x, and y is "+ loc[1]);
-							FlowPanel.flood.move(loc[0], loc[1], FlowPanel.land);
+							FlowPanel.flood.move(loc[0], loc[1], FlowPanel.land,name);
 						}
 						//System.out.println("printing i: " + i + "from thread " + name);
 						bT.set(false);

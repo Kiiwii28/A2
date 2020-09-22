@@ -15,6 +15,7 @@ public class Flow{
 	static int frameY;
 
 	static FlowPanel fp;
+	static String sTimeStep;
 	static Water2 flood; //might not be necessary could be handeled by waterpanel
 
 	// start timer
@@ -26,10 +27,17 @@ public class Flow{
 	private static float tock(){
 		return (System.currentTimeMillis() - startTime) / 1000.0f; 
 	}
-	
+
+	public static void TimeStep(int iteration){
+		sTimeStep = (iteration*10) + " miliseconds.";
+	}
+
 	public static void setupGUI(int frameX,int frameY,Terrain landdata) {
 
+
 		JLabel timeStepper = new JLabel("test");
+//		timeStepper.setText(sTimeStep);
+
 		Dimension fsize = new Dimension(800, 800);
     	JFrame frame = new JFrame("Waterflow"); 
     	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,7 +57,8 @@ public class Flow{
 				System.out.println("you clicked, didn't you?");
 				int mousex = e.getX();
 				int mousey = e.getY();
-				flood.drop(mousex,mousey,10,6);
+				flood.drop(mousex,mousey,3,2);
+				fp.repaint();
 				//fp.test();
 			}
 
@@ -117,12 +126,14 @@ public class Flow{
 		 *
 		 * then add button panel to main panel on JFrame
 		 */
+		b.add(timeStepper);
 		b.add(endB);
 		b.add(btReset);
 		//b.add(kiera);
 		b.add(bPause);
 		b.add(bStart);
 		g.add(b);
+
     	
 		frame.setSize(frameX, frameY+50);	// a little extra space at the bottom for buttons
       	frame.setLocationRelativeTo(null);  // center window on screen
