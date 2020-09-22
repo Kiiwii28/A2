@@ -120,6 +120,7 @@ public class Water{
             //check not edge because edges would be zero
             for (int i = -1; i < 2; i++) {
                 for (int j = -1; j < 2; j++) {
+                    if((x+i)>=0 & (y+j) >=0 & (x+i)<dimx & (y+j)<dimy)
                     surface = land.getHeight(x + i, y + j) + (arrAtomic[x + i][y + j].get() * 0.01f);
                     if (surface < surfaceMin) {
                         //System.out.println("new min is " + surface );

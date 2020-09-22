@@ -2,6 +2,7 @@ package FlowSkeleton;
 
 import java.awt.Graphics;
 import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,6 +13,7 @@ public class FlowPanel extends JPanel implements Runnable {
 	static Water2 flood;
 	static volatile boolean bPause;
 	volatile boolean bRunning;
+	static volatile boolean bReset = false;
 	AtomicBoolean booleant1 = new AtomicBoolean(true);
 	AtomicBoolean booleant2 = new AtomicBoolean(true);
 	AtomicBoolean booleant3 = new AtomicBoolean(true);
@@ -84,11 +86,11 @@ public class FlowPanel extends JPanel implements Runnable {
 	public void run(){
 		AtomicBoolean ab = new AtomicBoolean(true);
 		int partLength = land.permute.size()/4;
+	System.out.println("0 + " + partLength + " " + 2*partLength + " " + 3*partLength + " " + 4*partLength + ". land permute size is " + land.permute.size());
 
-
-		Thread testing1 = new Thread(new FlowSkeleton.Task(0, partLength-1, "T1", booleant1));
-		Thread testing2 = new Thread(new FlowSkeleton.Task(partLength, 2*partLength-1, "T2", booleant2));
-		Thread testing3 = new Thread(new FlowSkeleton.Task(2*partLength, 3*partLength-1, "T3", booleant3));
+		Thread testing1 = new Thread(new FlowSkeleton.Task(0, partLength, "T1", booleant1));
+		Thread testing2 = new Thread(new FlowSkeleton.Task(partLength, 2*partLength, "T2", booleant2));
+		Thread testing3 = new Thread(new FlowSkeleton.Task(2*partLength, 3*partLength, "T3", booleant3));
 		Thread testing4 = new Thread(new FlowSkeleton.Task(3*partLength, land.permute.size(), "T4", booleant4));
 
 		testing1.start();
@@ -103,11 +105,11 @@ public class FlowPanel extends JPanel implements Runnable {
 			if(!bPause){
 				//System.out.println("while loop");
 				flood.clearEdges(); //if all waiting after a pause, will resume them
-				if (booleant1.get()==false && booleant2.get()==false && booleant3.get()==false && booleant4.get()==false){// ((System.currentTimeMillis()-start)>50)){
+				if (booleant1.get()==false && booleant2.get()==false && booleant3.get()==false && booleant4.get()==false && ((System.currentTimeMillis()-startT)>10)){
 					iteration++;
-				//	System.out.println(tock() + " threads done");
-					//System.out.println("full 2d grid iteration " + iteration + " and trying to give head start");
-
+					System.out.println(tock() + " threads done");
+					System.out.println("full 2d grid iteration " + iteration + " and trying to give head start");
+					startT = System.currentTimeMillis();
 					tick();
 					repaint();
 					//System.out.println(tock() + " repaint done");
@@ -155,6 +157,9 @@ public class FlowPanel extends JPanel implements Runnable {
 				hi = pHi;
 				name = word;
 				bT = booleant;
+				System.out.println("hi = " + hi + ". lo = "+lo);
+				System.out.println("hi - lo = " + (hi - lo) );
+
 
 			}
 
@@ -170,7 +175,8 @@ public class FlowPanel extends JPanel implements Runnable {
 
 						int local = 0;
 						for (int i = lo; i < hi; i++) {
-							if (FlowPanel.bPause == true){ //so doesn' just check after entire iteration
+							if (FlowPanel.bPause == true) { //so doesn' just check after entire iteration
+								//System.out.println("reset = true inside thread");
 								break;
 							}
 							int[] loc = new int[2];
@@ -184,10 +190,11 @@ public class FlowPanel extends JPanel implements Runnable {
 						bT.set(false);
 						//break;
 
+					}
 //					else {
 //						System.out.println(name + "waiting");
 //					}
-						//BELOW CODE WAS TAKEN OU TO TRY SPEED UP
+					/**	//BELOW CODE WAS TAKEN OU TO TRY SPEED UP
 					} else { //now its boolean is false and it is waiting
 						try {
 							//System.out.println(name + "waiting");
@@ -196,7 +203,7 @@ public class FlowPanel extends JPanel implements Runnable {
 							System.out.println("insomniacs can't sleep");
 							e.printStackTrace();
 						}
-					}
+					}**/
 
 				}
 			}

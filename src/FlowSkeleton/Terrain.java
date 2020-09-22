@@ -110,7 +110,13 @@ public class Terrain {
 			
 			// populate height grid
 			height = new float[dimx][dimy];
-			
+
+//			for(int x = 0; x < dimx; x++){
+//				for(int y = 0; y < dimy; y++){
+//					height[x][y] = sc.nextFloat();
+//				}
+//			}
+
 			for(int y = 0; y < dimy; y++){
 				for(int x = 0; x < dimx; x++)	
 					height[x][y] = sc.nextFloat();

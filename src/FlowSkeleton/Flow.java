@@ -13,6 +13,7 @@ public class Flow{
 	static long startTime = 0;
 	static int frameX;
 	static int frameY;
+
 	static FlowPanel fp;
 	static Water2 flood; //might not be necessary could be handeled by waterpanel
 
@@ -27,7 +28,8 @@ public class Flow{
 	}
 	
 	public static void setupGUI(int frameX,int frameY,Terrain landdata) {
-		
+
+		JLabel timeStepper = new JLabel("test");
 		Dimension fsize = new Dimension(800, 800);
     	JFrame frame = new JFrame("Waterflow"); 
     	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,7 +49,7 @@ public class Flow{
 				System.out.println("you clicked, didn't you?");
 				int mousex = e.getX();
 				int mousey = e.getY();
-				flood.drop(mousex,mousey,2,2);
+				flood.drop(mousex,mousey,10,6);
 				//fp.test();
 			}
 
@@ -68,9 +70,15 @@ public class Flow{
 		});
 
 		JButton btReset = new JButton("Reset");
-		kiera.addActionListener(new ActionListener(){
+		btReset.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				flood.init();
+				//flood.init();
+				System.out.println("resettt BUTTON");
+
+				flood.Clear();
+				FlowPanel.bReset = true;
+				fp.repaint();
+				System.out.println("resettt");
 			}
 		});
 
@@ -110,7 +118,8 @@ public class Flow{
 		 * then add button panel to main panel on JFrame
 		 */
 		b.add(endB);
-		b.add(kiera);
+		b.add(btReset);
+		//b.add(kiera);
 		b.add(bPause);
 		b.add(bStart);
 		g.add(b);

@@ -15,9 +15,10 @@ public class Water2{
     volatile boolean bFirstRun;
     int dimY;
     int dimX;
+    Color transparent = new Color(0,0,0,0);
    // ArrayList<Integer> blue = new ArrayList<Integer>();
     ArrayList<Integer> edges = new ArrayList<Integer>();
-    ArrayList<Integer> check = new ArrayList<Integer>();
+   volatile ArrayList<Integer> check = new ArrayList<Integer>();
    // ArrayList<Integer> clear = new ArrayList<Integer>();
 
     public Water2(int xx, int yy){
@@ -98,6 +99,20 @@ public class Water2{
         }
     }
 
+    public synchronized void Clear(){
+        System.out.println("clearing");
+        for(int i = 0; i <dim ; i++){
+            wLevel.set(i,0);
+        }
+        check.clear();
+        for(int i = 0; i<dimX;i++){
+            for(int j = 0; j<dimY;j++){
+                wImg.setRGB(i,j,transparent.getRGB());
+            }
+        }
+
+    }
+
     /**
      *
      * @param x
@@ -121,13 +136,18 @@ public class Water2{
             //check not edge because edges would be zero
             for(int i = -1; i<2;i++) {
                 for (int j = -1; j < 2; j++) {
-                    surface = land.getHeight(x + i, y + j) + (float)(getWaterLevel(x + i, y + j)*0.01);
-                    if (surface < surfaceMin) {
-                        //System.out.println("new min is " + surface );
-                        surfaceMin = surface;
-                        minX = x + i;
-                        minY = y + j;
+                    //only checks actual grid points
+                    if(  ((x+i)>=0) & ((y+j)>=0) & ((x+i)<dimX) & ((y+j)<dimY)  ){
+                        surface = land.getHeight(x + i, y + j) + (float)(getWaterLevel(x + i, y + j)*0.01);
+
+                        if (surface < surfaceMin) {
+                            //System.out.println("new min is " + surface );
+                            surfaceMin = surface;
+                            minX = x + i;
+                            minY = y + j;
+                        }
                     }
+
                 }
             }
                 if ((minX != x) & (minY != y)){
@@ -170,7 +190,7 @@ public class Water2{
 
 //        int height = dimX; //rows
 //        int width = dimY; //columns
-        Color transparent = new Color(0,0,0,0);
+
 
         if (bFirstRun){
             wImg = new BufferedImage(dimX, dimY, BufferedImage.TYPE_INT_ARGB);
